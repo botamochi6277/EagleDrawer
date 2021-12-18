@@ -14,7 +14,8 @@ def draw_circle(circle: ET.ElementTree, ax: plt.Axes):
     r = float(attr['radius'])
     w = float(attr['width'])
     layer = int(attr['layer'])
-    c = patches.Circle(xy=(x, y), radius=r, ec='#ffffff', fill=False)
+    c = patches.Circle(xy=(x, y), radius=r, ec='#ffffff',
+                       fill=False, linewidth=w)
     ax.add_patch(c)
 
 
