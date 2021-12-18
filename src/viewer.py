@@ -29,6 +29,11 @@ def inch_to_point(inch):
     return inch * dpi
 
 
+def mm_to_point(mm):
+    dpi = 72  # dot per inch
+    return (mm/25.4) * dpi
+
+
 def search_layer(layers: ET.ElementTree, no: int):
     for l in layers:
         attr = l.attrib
@@ -49,7 +54,7 @@ def draw_circle(circle: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
     layer = search_layer(layers, layer_no)
     color_id = int(layer.attrib['color'])
     c = patches.Circle(xy=(x, y), radius=r, ec=eagle_colors[color_id],
-                       fill=False, linewidth=inch_to_point(w))
+                       fill=False, linewidth=mm_to_point(w))
     ax.add_patch(c)
 
 
