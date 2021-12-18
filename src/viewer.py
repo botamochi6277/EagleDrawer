@@ -6,25 +6,43 @@ plt.rcParams["svg.fonttype"] = "none"
 plt.rcParams["figure.facecolor"] = 'black'
 plt.rcParams["axes.facecolor"] = 'black'
 
+# https://coolors.co/0696d7-0dab76-32c8c8-c90d15-ffba08
+# 17
+eagle_colors = ['#ffffff', '#0696D7', '#0DAB76', '32C8C8',
+                '#C90D15', '#FFBA08', '#C8C832', '#808080',
+                '#282828', '#8252C2', '#00ff00', '#00ffff',
+                '#ff0000', '#ff00ff', '#FFCD07', '#AFD134']
 
-def draw_circle(circle: ET.ElementTree, ax: plt.Axes):
+
+def search_layer(layers: ET.ElementTree, no: int):
+    for l in layers:
+        attr = l.attrib
+        if no == int(attr['number']):
+            return l
+
+    return None
+
+
+def draw_circle(circle: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
     attr = circle.attrib
     x = float(attr['x'])
     y = float(attr['y'])
     r = float(attr['radius'])
     w = float(attr['width'])
-    layer = int(attr['layer'])
-    c = patches.Circle(xy=(x, y), radius=r, ec='#ffffff',
+    layer_no = int(attr['layer'])
+    layer = search_layer(layers, layer_no)
+    color_id = int(layer.attrib['color'])
+    c = patches.Circle(xy=(x, y), radius=r, ec=eagle_colors[color_id],
                        fill=False, linewidth=w)
     ax.add_patch(c)
 
 
-def draw_package(package: ET.ElementTree):
+def draw_package(package: ET.ElementTree, layers: ET.ElementTree):
     fig = plt.figure()
     ax = plt.axes()
 
     for circle in package.findall('circle'):
-        draw_circle(circle, ax)
+        draw_circle(circle, layers, ax)
 
     # ax.plot([0, 1], [0, 1])
     plt.axis('scaled')
@@ -55,7 +73,7 @@ def parse_tree(filename):
     print(f'# devicesets: {len(devicesets)}')
 
     for package in packages:
-        draw_package(package)
+        draw_package(package, layers)
 
 
 if __name__ == '__main__':
