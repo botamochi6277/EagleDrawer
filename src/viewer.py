@@ -86,6 +86,22 @@ def draw_circle(circle: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
     ax.add_patch(c)
 
 
+def draw_text(text: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
+    attr = text.attrib
+    x = float(attr['x'])
+    y = float(attr['y'])
+    size = float(attr['size'])
+    font = attr['font']
+    align = attr['align']
+    txt = text.text
+
+    # inch to point
+    layer_no = int(attr['layer'])
+    layer = search_layer(layers, layer_no)
+    color_id = int(layer.attrib['color'])
+    ax.text(x, y, txt)
+
+
 def draw_package(package: ET.ElementTree, layers: ET.ElementTree):
     fig = plt.figure()
     ax = plt.axes()
@@ -95,6 +111,9 @@ def draw_package(package: ET.ElementTree, layers: ET.ElementTree):
 
     for circle in package.findall('circle'):
         draw_circle(circle, layers, ax)
+
+    for text in package.findall('text'):
+        draw_text(text, layers, ax)
 
     # ax.plot([0, 1], [0, 1])
     plt.axis('scaled')
