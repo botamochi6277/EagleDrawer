@@ -63,10 +63,11 @@ def draw_pad(pad: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
     layer = search_layer(layers, layer_no)
     color_id = int(layer.attrib['color'])
     c = patches.Circle(xy=(x, y), radius=0.5*diameter,
-                       ec=None, fc=eagle_colors[color_id])
+                       ec=None, fc=eagle_colors[color_id], zorder=-layer_no)
     ax.add_patch(c)
 
-    d = patches.Circle(xy=(x, y), radius=0.5*drill, ec=None, fc='#a0a0a0')
+    d = patches.Circle(xy=(x, y), radius=0.5*drill, ec=None,
+                       fc='#a0a0a0', zorder=-layer_no)
     ax.add_patch(d)
 
 
@@ -81,7 +82,7 @@ def draw_circle(circle: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
     layer = search_layer(layers, layer_no)
     color_id = int(layer.attrib['color'])
     c = patches.Circle(xy=(x, y), radius=r, ec=eagle_colors[color_id],
-                       fill=False, linewidth=mm_to_point(w))
+                       fill=False, linewidth=mm_to_point(w), zorder=-layer_no)
     ax.add_patch(c)
 
 
