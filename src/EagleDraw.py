@@ -13,10 +13,26 @@ class Unit(Enum):
 
 # https://coolors.co/0696d7-0dab76-32c8c8-c90d15-ffba08
 # https://coolors.co/c8c832-808080-8252c2-ffcd07-afd108
-eagle_colors = ['#ffffff', '#0696D7', '#0DAB76', '32C8C8',
-                '#C90D15', '#FFBA08', '#C8C832', '#808080',
-                '#282828', '#8252C2', '#00ff00', '#00ffff',
-                '#ff0000', '#ff00ff', '#FFCD07', '#AFD134']
+eagle_colors = {
+    0: '#ffffff',
+    1: '#0696D7',
+    2: '#0DAB76',
+    3: '32C8C8',
+    4: '#C90D15',
+    5: '#FFBA08',
+    6: '#C8C832',
+    7: '#808080',
+    8: '#282828',
+    9: '#8252C2',
+    10: '#00ff00',
+    11: '#00ffff',
+    12: '#ff0000',
+    13: '#ff00ff',
+    14: '#FFCD07',
+    15: '#AFD134',
+    94: '#ff0000',
+    95: '#ff0000',
+    96: '#ff0000', }
 
 
 def inch_to_point(inch):
@@ -144,6 +160,47 @@ def draw_text(text: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
     # ax.add_artist(t)
 
 
+def draw_pin(pin: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
+    attr = pin.attrib
+    x0 = float(attr['x'])
+    y0 = float(attr['y'])
+    length = attr['length']
+    dx = 2.54
+    dy = 0
+    if length == 'short':
+        dx = 2.54
+        dy = 0
+    elif length == 'long':
+        dx = 2.54
+        dy = 0
+
+    rot = 'R0'
+    if 'rot' in attr:
+        rot = attr['rot']
+
+    if rot == 'R0':
+        x = [x0, x0+dx]
+        y = [y0, y0]
+    elif rot == 'R90':
+        x = [x0, x0]
+        y = [y0, y0+dx]
+    elif rot == 'R180':
+        x = [x0, x0-dx]
+        y = [y0, y0]
+    elif rot == 'R270':
+        x = [x0, x0]
+        y = [y0, y0-dx]
+
+    layer_no = 94  # pin layer may be fixed
+    layer = search_layer(layers, layer_no)
+    color_id = int(layer.attrib['color'])
+    w = 0.1
+    l = LineDataUnits(x, y, linewidth=w,
+                      color=eagle_colors[color_id], zorder=-layer_no)
+
+    ax.add_line(l)
+
+
 def draw_package(package: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
 
     name = package.attrib['name']
@@ -161,6 +218,27 @@ def draw_package(package: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
         draw_wire(wire, layers, ax)
 
     for text in package.findall('text'):
+        draw_text(text, layers, ax)
+
+    # ax.plot([0, 1], [0, 1])
+    plt.axis('scaled')
+    ax.set_aspect('equal')
+
+
+def draw_symbol(symbol: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
+
+    name = symbol.attrib['name']
+
+    for pin in symbol.findall('pin'):
+        draw_pin(pin, layers, ax)
+
+    for circle in symbol.findall('circle'):
+        draw_circle(circle, layers, ax)
+
+    for wire in symbol.findall('wire'):
+        draw_wire(wire, layers, ax)
+
+    for text in symbol.findall('text'):
         draw_text(text, layers, ax)
 
     # ax.plot([0, 1], [0, 1])

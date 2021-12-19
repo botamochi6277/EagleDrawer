@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import os
 
-from EagleDraw import draw_package
+from EagleDraw import draw_package, draw_symbol
 
 # matplotlib config
 plt.style.use('dark_background')
@@ -49,6 +49,16 @@ def parse_tree(filename):
         name = package.attrib['name']
         ax.set_title(name)
         figpath = os.path.join(dirpath, f'packages/{name}.svg')
+        plt.savefig(figpath)
+
+    os.makedirs(os.path.join(dirpath, f'symbols'), exist_ok=True)
+    for symbol in symbols:
+        fig = plt.figure()
+        ax = plt.axes()
+        draw_symbol(symbol, layers, ax=ax)
+        name = symbol.attrib['name']
+        ax.set_title(name)
+        figpath = os.path.join(dirpath, f'symbols/{name}.svg')
         plt.savefig(figpath)
 
 
