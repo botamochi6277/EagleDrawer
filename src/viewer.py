@@ -53,15 +53,21 @@ def draw_pad(pad: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
     drill = float(attr['drill'])
     diameter = float(attr['diameter'])
 
-    w = 0.5*(diameter-drill)
-    r = 0.5*drill + w
+    print(f'pad')
+    print(f'drill : {drill}, diameter : {diameter}')
 
+    w = 0.5*(diameter-drill)
+    r = 0.5*drill + 0.5*w
+    print(f'width: {w}, pt: {mm_to_point(w)}')
     layer_no = 17  # Pad layer no. may be fixed
     layer = search_layer(layers, layer_no)
     color_id = int(layer.attrib['color'])
-    c = patches.Circle(xy=(x, y), radius=r, ec=eagle_colors[color_id],
-                       fill=False, linewidth=mm_to_point(w))
+    c = patches.Circle(xy=(x, y), radius=0.5*diameter,
+                       ec=None, fc=eagle_colors[color_id])
     ax.add_patch(c)
+
+    d = patches.Circle(xy=(x, y), radius=0.5*drill, ec=None, fc='#a0a0a0')
+    ax.add_patch(d)
 
 
 def draw_circle(circle: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
