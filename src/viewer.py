@@ -1,3 +1,4 @@
+from posixpath import basename
 import xml.etree.ElementTree as ET
 import argparse
 import matplotlib.pyplot as plt
@@ -56,12 +57,12 @@ def draw_pad(pad: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
     drill = float(attr['drill'])
     diameter = float(attr['diameter'])
 
-    print(f'pad')
-    print(f'drill : {drill}, diameter : {diameter}')
+    # print(f'pad')
+    # print(f'drill : {drill}, diameter : {diameter}')
 
     w = 0.5*(diameter-drill)
     r = 0.5*drill + 0.5*w
-    print(f'width: {w}, pt: {mm_to_point(w)}')
+    # print(f'width: {w}, pt: {mm_to_point(w)}')
     layer_no = 17  # Pad layer no. may be fixed
     layer = search_layer(layers, layer_no)
     color_id = int(layer.attrib['color'])
@@ -94,8 +95,12 @@ def draw_text(text: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
     x = float(attr['x'])
     y = float(attr['y'])
     size = float(attr['size'])
-    font = attr['font']
-    align = attr['align']
+    font = 'monospace'
+    if 'font' in attr:
+        font = attr['font']
+    align = 'left'
+    if 'align' in attr:
+        align = attr['align']
     txt = text.text
 
     # inch to point
@@ -111,9 +116,8 @@ def draw_text(text: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
     # ax.add_artist(t)
 
 
-def draw_package(package: ET.ElementTree, layers: ET.ElementTree):
-    fig = plt.figure()
-    ax = plt.axes()
+def draw_package(package: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
+
     name = package.attrib['name']
 
     for pad in package.findall('pad'):
@@ -128,15 +132,16 @@ def draw_package(package: ET.ElementTree, layers: ET.ElementTree):
     # ax.plot([0, 1], [0, 1])
     plt.axis('scaled')
     ax.set_aspect('equal')
-    name = package.attrib['name']
-    ax.set_title(name)
-    plt.savefig(f'{name}.svg')
 
 
 def parse_tree(filename):
     tree = ET.parse(filename)
     root = tree.getroot()
     print(f'root tag: {root.tag}')
+
+    basename = os.path.basename(filename).split('.')[0]
+    dirpath = os.path.join(os.path.dirname(__file__), f'../dst/{basename}')
+    os.makedirs(dirpath, exist_ok=True)
 
     drawing = root.find('drawing')
 
@@ -154,8 +159,15 @@ def parse_tree(filename):
     print(f'# symbols: {len(symbols)}')
     print(f'# devicesets: {len(devicesets)}')
 
+    os.makedirs(os.path.join(dirpath, f'packages'), exist_ok=True)
     for package in packages:
-        draw_package(package, layers)
+        fig = plt.figure()
+        ax = plt.axes()
+        draw_package(package, layers, ax=ax)
+        name = package.attrib['name']
+        ax.set_title(name)
+        figpath = os.path.join(dirpath, f'packages/{name}.svg')
+        plt.savefig(figpath)
 
 
 if __name__ == '__main__':
