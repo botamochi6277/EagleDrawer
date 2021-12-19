@@ -6,7 +6,7 @@ import matplotlib.patches as patches
 import os
 from enum import Enum
 
-from DiagramDataUnit import CircleDataUnit, TextDataUnit, Text
+from DiagramDataUnit import CircleDataUnit, TextDataUnit, Text, LineDataUnits
 
 
 class Unit(Enum):
@@ -75,6 +75,22 @@ def draw_pad(pad: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
     ax.add_patch(d)
 
 
+def draw_wire(wire: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
+    attr = wire.attrib
+    x = [float(attr['x1']), float(attr['x2'])]
+    y = [float(attr['y1']), float(attr['y2'])]
+    w = float(attr['width'])
+
+    layer_no = int(attr['layer'])
+    layer = search_layer(layers, layer_no)
+    color_id = int(layer.attrib['color'])
+
+    l = LineDataUnits(x, y, linewidth=w,
+                      color=eagle_colors[color_id], zorder=-layer_no)
+
+    ax.add_line(l)
+
+
 def draw_circle(circle: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
     attr = circle.attrib
     x = float(attr['x'])
@@ -125,6 +141,9 @@ def draw_package(package: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
 
     for circle in package.findall('circle'):
         draw_circle(circle, layers, ax)
+
+    for wire in package.findall('wire'):
+        draw_wire(wire, layers, ax)
 
     for text in package.findall('text'):
         draw_text(text, layers, ax)
