@@ -5,6 +5,8 @@ import matplotlib.patches as patches
 import os
 from enum import Enum
 
+from DiagramDataUnit import CircleDataUnit
+
 
 class Unit(Enum):
     MM = 0
@@ -81,8 +83,8 @@ def draw_circle(circle: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
     layer_no = int(attr['layer'])
     layer = search_layer(layers, layer_no)
     color_id = int(layer.attrib['color'])
-    c = patches.Circle(xy=(x, y), radius=r, ec=eagle_colors[color_id],
-                       fill=False, linewidth=mm_to_point(w), zorder=-layer_no)
+    c = CircleDataUnit(xy=(x, y), radius=r, ec=eagle_colors[color_id],
+                       fill=False, linewidth=(w), zorder=-layer_no)
     ax.add_patch(c)
 
 
@@ -99,7 +101,8 @@ def draw_text(text: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
     layer_no = int(attr['layer'])
     layer = search_layer(layers, layer_no)
     color_id = int(layer.attrib['color'])
-    ax.text(x, y, txt)
+    ax.text(x, y, txt, fontfamily='monospace',
+            fontsize=mm_to_point(size), zorder=-layer_no)
 
 
 def draw_package(package: ET.ElementTree, layers: ET.ElementTree):
