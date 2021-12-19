@@ -6,7 +6,8 @@
 .LSOverride
 
 # Icon must end with two \r
-Icon
+Icon
+
 
 # Thumbnails
 ._*
@@ -207,3 +208,8 @@ venv.bak/
 dmypy.json
 
 
+## Custom
+tmp
+lbr
+sch
+brd
