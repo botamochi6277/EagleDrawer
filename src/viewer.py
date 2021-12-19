@@ -22,7 +22,7 @@ def parse_tree(filename):
     print(f'root tag: {root.tag}')
 
     basename = os.path.basename(filename).split('.')[0]
-    dirpath = os.path.join(os.path.dirname(__file__), f'../dst/{basename}')
+    dirpath = os.path.join(os.path.dirname(__file__), f'../imgs/{basename}')
     os.makedirs(dirpath, exist_ok=True)
 
     drawing = root.find('drawing')

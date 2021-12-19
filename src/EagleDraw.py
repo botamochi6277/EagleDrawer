@@ -151,9 +151,14 @@ def draw_text(text: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
     layer_no = int(attr['layer'])
     layer = search_layer(layers, layer_no)
     color_id = int(layer.attrib['color'])
-    ax.text(x, y, txt, fontfamily='sans-serif',
-            fontsize=mm_to_point(size), zorder=-layer_no)
+    t = ax.text(x, y, txt, fontfamily='sans-serif',
+                fontsize=size, zorder=-layer_no)
+    # ppd = 72.0/ax.figure.dpi
+    # tf = ax.transData.transform
+    # fontsize = ((tf((1, size))-tf((0, 0)))*ppd)[1]
+    # t.set_fontsize(fontsize)
 
+    print(f'text type: {type(t)}')
     # t = TextDataUnit(x, y, txt, fontfamily='monospace',
     #                  fontsize=size, zorder=-layer_no, transform=ax.transAxes)
 
