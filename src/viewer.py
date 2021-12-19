@@ -2,7 +2,7 @@ import xml.etree.ElementTree as ET
 import argparse
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
-
+import os
 from enum import Enum
 
 
@@ -12,9 +12,12 @@ class Unit(Enum):
     MIL = 2
 
 
+# matplotlib config
+plt.style.use('dark_background')
 plt.rcParams["svg.fonttype"] = "none"
 plt.rcParams["figure.facecolor"] = '#2b2b2b'
 plt.rcParams["axes.facecolor"] = '#2b2b2b'
+plt.rcParams["savefig.facecolor"] = '#2b2b2b'
 
 # https://coolors.co/0696d7-0dab76-32c8c8-c90d15-ffba08
 # https://coolors.co/c8c832-808080-8252c2-ffcd07-afd108
