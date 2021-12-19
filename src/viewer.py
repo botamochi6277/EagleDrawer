@@ -5,7 +5,7 @@ import matplotlib.patches as patches
 import os
 from enum import Enum
 
-from DiagramDataUnit import CircleDataUnit
+from DiagramDataUnit import CircleDataUnit, TextDataUnit, Text
 
 
 class Unit(Enum):
@@ -20,6 +20,7 @@ plt.rcParams["svg.fonttype"] = "none"
 plt.rcParams["figure.facecolor"] = '#2b2b2b'
 plt.rcParams["axes.facecolor"] = '#2b2b2b'
 plt.rcParams["savefig.facecolor"] = '#2b2b2b'
+plt.rcParams["font.family"] = 'sans-serif'
 
 # https://coolors.co/0696d7-0dab76-32c8c8-c90d15-ffba08
 # https://coolors.co/c8c832-808080-8252c2-ffcd07-afd108
@@ -84,7 +85,7 @@ def draw_circle(circle: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
     layer = search_layer(layers, layer_no)
     color_id = int(layer.attrib['color'])
     c = CircleDataUnit(xy=(x, y), radius=r, ec=eagle_colors[color_id],
-                       fill=False, linewidth=(w), zorder=-layer_no)
+                       fill=False, linewidth=w, zorder=-layer_no)
     ax.add_patch(c)
 
 
@@ -101,13 +102,19 @@ def draw_text(text: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
     layer_no = int(attr['layer'])
     layer = search_layer(layers, layer_no)
     color_id = int(layer.attrib['color'])
-    ax.text(x, y, txt, fontfamily='monospace',
+    ax.text(x, y, txt, fontfamily='sans-serif',
             fontsize=mm_to_point(size), zorder=-layer_no)
+
+    # t = TextDataUnit(x, y, txt, fontfamily='monospace',
+    #                  fontsize=size, zorder=-layer_no, transform=ax.transAxes)
+
+    # ax.add_artist(t)
 
 
 def draw_package(package: ET.ElementTree, layers: ET.ElementTree):
     fig = plt.figure()
     ax = plt.axes()
+    name = package.attrib['name']
 
     for pad in package.findall('pad'):
         draw_pad(pad, layers, ax)
@@ -122,6 +129,7 @@ def draw_package(package: ET.ElementTree, layers: ET.ElementTree):
     plt.axis('scaled')
     ax.set_aspect('equal')
     name = package.attrib['name']
+    ax.set_title(name)
     plt.savefig(f'{name}.svg')
 
 
