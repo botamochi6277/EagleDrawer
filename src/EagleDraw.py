@@ -63,6 +63,30 @@ def draw_pad(pad: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
     ax.add_patch(d)
 
 
+def draw_smd(smd: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
+    attr = smd.attrib
+    # center location of smd land
+    x0 = float(attr['x'])
+    y0 = float(attr['y'])
+
+    dx = float(attr['dx'])
+    dy = float(attr['dy'])
+
+    # lower left corner location
+    x = x0-0.5*dx
+    y = y0-0.5*dy
+
+    w = dx
+    h = dy
+
+    layer_no = int(attr['layer'])
+    layer = search_layer(layers, layer_no)
+    color_id = int(layer.attrib['color'])
+    rect = patches.FancyBboxPatch(
+        xy=(x, y), width=w, height=h, fc=eagle_colors[color_id], ec=None, lw=None, zorder=-layer_no)
+    ax.add_patch(rect)
+
+
 def draw_wire(wire: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
     attr = wire.attrib
     x = [float(attr['x1']), float(attr['x2'])]
@@ -126,6 +150,9 @@ def draw_package(package: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
 
     for pad in package.findall('pad'):
         draw_pad(pad, layers, ax)
+
+    for smd in package.findall('smd'):
+        draw_smd(smd, layers, ax)
 
     for circle in package.findall('circle'):
         draw_circle(circle, layers, ax)
