@@ -164,29 +164,35 @@ def draw_pin(pin: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
     attr = pin.attrib
     x0 = float(attr['x'])
     y0 = float(attr['y'])
+    name = attr['name']
     length = attr['length']
     dx = 2.54
-    dy = 0
     if length == 'short':
         dx = 2.54
-        dy = 0
     elif length == 'long':
         dx = 2.54
-        dy = 0
 
     rot = 'R0'
     if 'rot' in attr:
         rot = attr['rot']
 
+    halign = 'center'
+    text_x = x0
+    text_y = y0
+
     if rot == 'R0':
         x = [x0, x0+dx]
         y = [y0, y0]
+        halign = 'left'
+        text_x = x0+2*dx
     elif rot == 'R90':
         x = [x0, x0]
         y = [y0, y0+dx]
     elif rot == 'R180':
         x = [x0, x0-dx]
         y = [y0, y0]
+        halign = 'right'
+        text_x = x0-2*dx
     elif rot == 'R270':
         x = [x0, x0]
         y = [y0, y0-dx]
@@ -199,6 +205,9 @@ def draw_pin(pin: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
                       color=eagle_colors[color_id], zorder=-layer_no)
 
     ax.add_line(l)
+
+    ax.text(text_x, text_y, name, verticalalignment='center',
+            horizontalalignment=halign, color=eagle_colors[color_id], zorder=-layer_no)
 
 
 def draw_package(package: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
