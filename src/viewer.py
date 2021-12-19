@@ -17,7 +17,7 @@ plt.rcParams["figure.facecolor"] = '#2b2b2b'
 plt.rcParams["axes.facecolor"] = '#2b2b2b'
 
 # https://coolors.co/0696d7-0dab76-32c8c8-c90d15-ffba08
-# 17
+# https://coolors.co/c8c832-808080-8252c2-ffcd07-afd108
 eagle_colors = ['#ffffff', '#0696D7', '#0DAB76', '32C8C8',
                 '#C90D15', '#FFBA08', '#C8C832', '#808080',
                 '#282828', '#8252C2', '#00ff00', '#00ffff',
@@ -43,6 +43,24 @@ def search_layer(layers: ET.ElementTree, no: int):
     return None
 
 
+def draw_pad(pad: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
+    attr = pad.attrib
+    x = float(attr['x'])
+    y = float(attr['y'])
+    drill = float(attr['drill'])
+    diameter = float(attr['diameter'])
+
+    w = 0.5*(diameter-drill)
+    r = 0.5*drill + w
+
+    layer_no = 17  # Pad layer no. may be fixed
+    layer = search_layer(layers, layer_no)
+    color_id = int(layer.attrib['color'])
+    c = patches.Circle(xy=(x, y), radius=r, ec=eagle_colors[color_id],
+                       fill=False, linewidth=mm_to_point(w))
+    ax.add_patch(c)
+
+
 def draw_circle(circle: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
     attr = circle.attrib
     x = float(attr['x'])
@@ -61,6 +79,9 @@ def draw_circle(circle: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
 def draw_package(package: ET.ElementTree, layers: ET.ElementTree):
     fig = plt.figure()
     ax = plt.axes()
+
+    for pad in package.findall('pad'):
+        draw_pad(pad, layers, ax)
 
     for circle in package.findall('circle'):
         draw_circle(circle, layers, ax)
