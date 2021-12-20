@@ -64,8 +64,9 @@ def parse_tree(filename):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('filename')
+    parser.add_argument('filenames', nargs='*')
 
     args = parser.parse_args()
-
-    parse_tree(args.filename)
+    print(args.filenames)
+    for filename in args.filenames:
+        parse_tree(filename)
