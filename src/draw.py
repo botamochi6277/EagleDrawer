@@ -5,7 +5,10 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import os
 
+from colorful_logger import get_colorful_logger
 from EagleDraw import draw_package, draw_symbol
+
+logger = get_colorful_logger(__name__)
 
 # matplotlib config
 plt.style.use('dark_background')
@@ -19,7 +22,8 @@ plt.rcParams["font.family"] = 'sans-serif'
 def parse_tree(filename):
     tree = ET.parse(filename)
     root = tree.getroot()
-    print(f'root tag: {root.tag}')
+    logger.info(f'parse {filename}')
+    logger.debug(f'root tag: {root.tag}')
 
     basename = os.path.basename(filename).split('.')[0]
     dirpath = os.path.join(os.path.dirname(__file__), f'../imgs/{basename}')
@@ -30,16 +34,16 @@ def parse_tree(filename):
     layers = drawing.find('layers')
     library = drawing.find('library')
     if library is None:
-        print('No Library')
+        logger.error('No Library')
         return
 
     packages = library.find('packages')
     symbols = library.find('symbols')
     devicesets = library.find('devicesets')
 
-    print(f'# packages: {len(packages)}')
-    print(f'# symbols: {len(symbols)}')
-    print(f'# devicesets: {len(devicesets)}')
+    logger.info(f'# packages: {len(packages)}')
+    logger.info(f'# symbols: {len(symbols)}')
+    logger.info(f'# devicesets: {len(devicesets)}')
 
     os.makedirs(os.path.join(dirpath, f'packages'), exist_ok=True)
     for package in packages:

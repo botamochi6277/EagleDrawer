@@ -158,7 +158,7 @@ def draw_text(text: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
     # fontsize = ((tf((1, size))-tf((0, 0)))*ppd)[1]
     # t.set_fontsize(fontsize)
 
-    print(f'text type: {type(t)}')
+    # print(f'text type: {type(t)}')
     # t = TextDataUnit(x, y, txt, fontfamily='monospace',
     #                  fontsize=size, zorder=-layer_no, transform=ax.transAxes)
 
