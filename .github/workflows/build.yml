@@ -1,0 +1,13 @@
+name: build-docker
+on: push
+
+jobs:
+  drawing_jobs:
+    runs-on: ubuntu-latest
+    name: build docker image
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+      - name: build
+        run: |
+          docker build -t test .
