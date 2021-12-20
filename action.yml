@@ -1,0 +1,16 @@
+name: 'Draw eagle design'
+description: 'Draw eagle parts library with python and matplotlib'
+author: 'botamochi6277'
+branding:
+  icon: 'image'
+  color: 'red'
+inputs:
+  filenames:
+    description: 'filenames of eagle designs'
+    default: '*.lbr'
+    required: true
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - ${{ inputs.filenames }}
