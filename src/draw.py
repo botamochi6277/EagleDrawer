@@ -19,15 +19,17 @@ plt.rcParams["savefig.facecolor"] = '#2b2b2b'
 plt.rcParams["font.family"] = 'sans-serif'
 
 
-def parse_tree(filename):
+def parse_tree(filename, outputdir='imgs'):
     tree = ET.parse(filename)
     root = tree.getroot()
     logger.info(f'parse {filename}')
     logger.debug(f'root tag: {root.tag}')
 
     basename = os.path.basename(filename).split('.')[0]
-    dirpath = os.path.join(os.path.dirname(__file__), f'../imgs/{basename}')
+    # dirpath = os.path.join(os.path.dirname(__file__), f'{outputdir}')
+    dirpath = os.path.join(outputdir, basename)
     os.makedirs(dirpath, exist_ok=True)
+    logger.debug(f'make {os.path.normpath(dirpath)}')
 
     drawing = root.find('drawing')
 
@@ -69,8 +71,9 @@ def parse_tree(filename):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('filenames', nargs='*')
-
+    parser.add_argument(
+        '--output', '-o', default='imgs', help='output path')
     args = parser.parse_args()
     print(args.filenames)
     for filename in args.filenames:
-        parse_tree(filename)
+        parse_tree(filename, args.output)
