@@ -77,6 +77,9 @@ def draw_pad(pad: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
     layer_no = 17  # Pad layer no. may be fixed
     layer = search_layer(layers, layer_no)
     color_id = int(layer.attrib['color'])
+    if not color_id in eagle_colors:
+        logger.warning(f'color id {color_id} is undefined')
+        color_id = 0
     c = patches.Circle(xy=(x, y), radius=0.5*diameter,
                        ec=None, fc=eagle_colors[color_id], zorder=-layer_no)
     ax.add_patch(c)
@@ -105,6 +108,11 @@ def draw_smd(smd: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
     layer_no = int(attr['layer'])
     layer = search_layer(layers, layer_no)
     color_id = int(layer.attrib['color'])
+
+    if not color_id in eagle_colors:
+        logger.warning(f'color id {color_id} is undefined')
+        color_id = 0
+
     rect = patches.FancyBboxPatch(
         xy=(x, y), width=w, height=h, fc=eagle_colors[color_id], ec=None, lw=None, zorder=-layer_no)
     ax.add_patch(rect)
@@ -119,7 +127,9 @@ def draw_wire(wire: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
     layer_no = int(attr['layer'])
     layer = search_layer(layers, layer_no)
     color_id = int(layer.attrib['color'])
-
+    if not color_id in eagle_colors:
+        logger.warning(f'color id {color_id} is undefined')
+        color_id = 0
     l = LineDataUnits(x, y, linewidth=w,
                       color=eagle_colors[color_id], zorder=-layer_no)
 
@@ -136,6 +146,10 @@ def draw_circle(circle: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
     layer_no = int(attr['layer'])
     layer = search_layer(layers, layer_no)
     color_id = int(layer.attrib['color'])
+    if not color_id in eagle_colors:
+        logger.warning(f'color id {color_id} is undefined')
+        color_id = 0
+
     c = CircleDataUnit(xy=(x, y), radius=r, ec=eagle_colors[color_id],
                        fill=False, linewidth=w, zorder=-layer_no)
     ax.add_patch(c)
@@ -158,6 +172,9 @@ def draw_text(text: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
     layer_no = int(attr['layer'])
     layer = search_layer(layers, layer_no)
     color_id = int(layer.attrib['color'])
+    if not color_id in eagle_colors:
+        logger.warning(f'color id {color_id} is undefined')
+        color_id = 0
     t = ax.text(x, y, txt, fontfamily='sans-serif',
                 fontsize=size, zorder=-layer_no)
     # ppd = 72.0/ax.figure.dpi
@@ -212,6 +229,9 @@ def draw_pin(pin: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
     layer_no = 94  # pin layer may be fixed
     layer = search_layer(layers, layer_no)
     color_id = int(layer.attrib['color'])
+    if not color_id in eagle_colors:
+        logger.warning(f'color id {color_id} is undefined')
+        color_id = 0
     w = 0.1
     l = LineDataUnits(x, y, linewidth=w,
                       color=eagle_colors[color_id], zorder=-layer_no)
