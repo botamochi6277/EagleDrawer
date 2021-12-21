@@ -63,7 +63,10 @@ def draw_pad(pad: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
     x = float(attr['x'])
     y = float(attr['y'])
     drill = float(attr['drill'])
-    diameter = float(attr['diameter'])
+
+    diameter = 2*drill
+    if 'diameter' in attr:
+        diameter = float(attr['diameter'])
 
     # print(f'pad')
     # print(f'drill : {drill}, diameter : {diameter}')
