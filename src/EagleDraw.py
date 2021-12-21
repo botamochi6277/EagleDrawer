@@ -3,6 +3,10 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from DiagramDataUnit import CircleDataUnit, TextDataUnit, Text, LineDataUnits
 from enum import Enum
+import os
+
+from colorful_logger import get_colorful_logger
+logger = get_colorful_logger(__name__)
 
 
 class Unit(Enum):
@@ -258,3 +262,52 @@ def draw_symbol(symbol: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
     # ax.plot([0, 1], [0, 1])
     plt.axis('scaled')
     ax.set_aspect('equal')
+
+
+def parse_tree(filename, outputdir='imgs'):
+    tree = ET.parse(filename)
+    root = tree.getroot()
+    logger.info(f'parse {filename}')
+    logger.debug(f'root tag: {root.tag}')
+
+    basename = os.path.basename(filename).split('.')[0]
+    # dirpath = os.path.join(os.path.dirname(__file__), f'{outputdir}')
+    dirpath = os.path.join(outputdir, basename)
+    os.makedirs(dirpath, exist_ok=True)
+    logger.debug(f'make {os.path.normpath(dirpath)}')
+
+    drawing = root.find('drawing')
+
+    layers = drawing.find('layers')
+    library = drawing.find('library')
+    if library is None:
+        logger.error('No Library')
+        return
+
+    packages = library.find('packages')
+    symbols = library.find('symbols')
+    devicesets = library.find('devicesets')
+
+    logger.info(f'# packages: {len(packages)}')
+    logger.info(f'# symbols: {len(symbols)}')
+    logger.info(f'# devicesets: {len(devicesets)}')
+
+    os.makedirs(os.path.join(dirpath, f'packages'), exist_ok=True)
+    for package in packages:
+        fig = plt.figure()
+        ax = plt.axes()
+        draw_package(package, layers, ax=ax)
+        name = package.attrib['name']
+        ax.set_title(name)
+        figpath = os.path.join(dirpath, f'packages/{name}.svg')
+        plt.savefig(figpath)
+
+    os.makedirs(os.path.join(dirpath, f'symbols'), exist_ok=True)
+    for symbol in symbols:
+        fig = plt.figure()
+        ax = plt.axes()
+        draw_symbol(symbol, layers, ax=ax)
+        name = symbol.attrib['name']
+        ax.set_title(name)
+        figpath = os.path.join(dirpath, f'symbols/{name}.svg')
+        plt.savefig(figpath)
