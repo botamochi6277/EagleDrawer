@@ -324,6 +324,8 @@ def parse_tree(filename, outputdir='imgs'):
         ax.set_title(name)
         figpath = os.path.join(dirpath, f'packages/{name}.svg')
         plt.savefig(figpath)
+        plt.close()
+        logger.debug(f'save {figpath}')
 
     os.makedirs(os.path.join(dirpath, f'symbols'), exist_ok=True)
     for symbol in symbols:
@@ -334,3 +336,5 @@ def parse_tree(filename, outputdir='imgs'):
         ax.set_title(name)
         figpath = os.path.join(dirpath, f'symbols/{name}.svg')
         plt.savefig(figpath)
+        plt.close()
+        logger.debug(f'save {figpath}')
