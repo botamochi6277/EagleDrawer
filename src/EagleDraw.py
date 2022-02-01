@@ -4,7 +4,7 @@ import matplotlib.patches as patches
 from DiagramDataUnit import CircleDataUnit, TextDataUnit, Text, LineDataUnits
 from enum import Enum
 import os
-
+import math
 from colorful_logger import get_colorful_logger
 logger = get_colorful_logger(__name__)
 
@@ -58,23 +58,23 @@ def search_layer(layers: ET.ElementTree, no: int):
     return None
 
 
-def rotate(x0, y0, dx, dy, rot='R0'):
-    if rot == 'R0':
-        x = [x0, x0+dx]
-        y = [y0, y0]
-        halign = 'left'
-        text_x = x0+2*dx
-    elif rot == 'R90':
-        x = [x0, x0]
-        y = [y0, y0+dx]
-    elif rot == 'R180':
-        x = [x0, x0-dx]
-        y = [y0, y0]
-        halign = 'right'
-        text_x = x0-2*dx
-    elif rot == 'R270':
-        x = [x0, x0]
-        y = [y0, y0-dx]
+def get_arc(x1, y1, x2, y2, phi, u: float = 1.0):
+    n = [-(y2-y1), (x2-x1)]
+    m = [0.5*(x1+x2), 0.5*(y1+y2)]
+    x3 = m[0] - u*n[0]
+    y3 = m[1] - u*n[1]
+
+    x0 = (x1**2*y2 - x1**2*y3 - x2**2*y1 + x2**2*y3 + x3**2*y1 - x3**2*y2 + y1**2*y2 - y1**2*y3 -
+          y1*y2**2 + y1*y3**2 + y2**2*y3 - y2*y3**2)/(2*(x1*y2 - x1*y3 - x2*y1 + x2*y3 + x3*y1 - x3*y2)+1e-6)
+    y0 = -(x1**2*x2 - x1**2*x3 - x1*x2**2 + x1*x3**2 - x1*y2**2 + x1*y3**2 + x2**2*x3 - x2*x3**2 +
+           x2*y1**2 - x2*y3**2 - x3*y1**2 + x3*y2**2)/(2*(x1*y2 - x1*y3 - x2*y1 + x2*y3 + x3*y1 - x3*y2)+1e-6)
+    r = -math.sqrt((x1**2 - 2*x1*x2 + x2**2 + y1**2 - 2*y1*y2 + y2**2)*(x1**2 - 2*x1*x3 + x3**2 + y1**2 - 2*y1*y3 + y3**2)
+                   * (x2**2 - 2*x2*x3 + x3**2 + y2**2 - 2*y2*y3 + y3**2))/(2*(x1*y2 - x1*y3 - x2*y1 + x2*y3 + x3*y1 - x3*y2)+1e-6)
+
+    theta1 = math.atan2((y1-y0), (x1-x0))
+    theta2 = math.atan2((y2-y0), (x2-x0))
+
+    return x0, y0, r, theta1, theta2, x3, y3
 
 
 def draw_pad(pad: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
@@ -125,7 +125,7 @@ def draw_smd(smd: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
     if 'rot' in attr:
         rot = attr['rot']
 
-    if rot is 'R0' or rot is 'R180':
+    if rot == 'R0' or rot == 'R180':
         # lower left corner location
         w = dx
         h = dy
@@ -154,6 +154,9 @@ def draw_wire(wire: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
     x = [float(attr['x1']), float(attr['x2'])]
     y = [float(attr['y1']), float(attr['y2'])]
     w = float(attr['width'])
+    curve = None
+    if 'curve' in attr:
+        curve = float(attr['curve'])
 
     layer_no = int(attr['layer'])
     layer = search_layer(layers, layer_no)
@@ -161,10 +164,38 @@ def draw_wire(wire: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
     if not color_id in eagle_colors:
         logger.warning(f'color id {color_id} is undefined')
         color_id = 0
-    l = LineDataUnits(x, y, linewidth=w,
-                      color=eagle_colors[color_id], zorder=-layer_no)
 
-    ax.add_line(l)
+    if curve is None:
+        # straight line
+        l = LineDataUnits(x, y, linewidth=w,
+                          color=eagle_colors[color_id], zorder=-layer_no)
+
+        ax.add_line(l)
+    else:
+        # draw arc
+        u = curve/360.0
+        x0, y0, r, t1, t2, x3, y3 = get_arc(
+            x[0], y[0], x[1], y[1], math.radians(curve), u=u)
+
+        arc = patches.Arc((x0, y0), r*2, r*2,
+                          theta1=math.degrees(t1),
+                          theta2=math.degrees(t2),
+                          linewidth=w,
+                          color=eagle_colors[color_id],  zorder=-layer_no)
+        ax.add_patch(arc)
+
+        # debug
+        # reference point
+        c = CircleDataUnit(xy=(x3, y3), radius=0.1, ec=eagle_colors[color_id],
+                           fill=False, linewidth=w, zorder=-layer_no)
+        ax.add_patch(c)
+
+        # mid point
+        m = [0.5*(x[0]+x[1]), 0.5*(y[0]+y[1])]
+
+        c = CircleDataUnit(xy=m, radius=0.01, ec=eagle_colors[color_id],
+                           fill=False, linewidth=w, zorder=-layer_no)
+        ax.add_patch(c)
 
 
 def draw_circle(circle: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
