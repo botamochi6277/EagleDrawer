@@ -1,7 +1,7 @@
 import xml.etree.ElementTree as ET
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
-from DiagramDataUnit import CircleDataUnit, TextDataUnit, Text, LineDataUnits
+from DiagramDataUnit import CircleDataUnit, TextDataUnit, Text, LineDataUnits, ArcDataUnit, get_arc_param
 from enum import Enum
 import os
 import math
@@ -56,25 +56,6 @@ def search_layer(layers: ET.ElementTree, no: int):
             return l
 
     return None
-
-
-def get_arc(x1, y1, x2, y2, phi, u: float = 1.0):
-    n = [-(y2-y1), (x2-x1)]
-    m = [0.5*(x1+x2), 0.5*(y1+y2)]
-    x3 = m[0] - u*n[0]
-    y3 = m[1] - u*n[1]
-
-    x0 = (x1**2*y2 - x1**2*y3 - x2**2*y1 + x2**2*y3 + x3**2*y1 - x3**2*y2 + y1**2*y2 - y1**2*y3 -
-          y1*y2**2 + y1*y3**2 + y2**2*y3 - y2*y3**2)/(2*(x1*y2 - x1*y3 - x2*y1 + x2*y3 + x3*y1 - x3*y2)+1e-6)
-    y0 = -(x1**2*x2 - x1**2*x3 - x1*x2**2 + x1*x3**2 - x1*y2**2 + x1*y3**2 + x2**2*x3 - x2*x3**2 +
-           x2*y1**2 - x2*y3**2 - x3*y1**2 + x3*y2**2)/(2*(x1*y2 - x1*y3 - x2*y1 + x2*y3 + x3*y1 - x3*y2)+1e-6)
-    r = -math.sqrt((x1**2 - 2*x1*x2 + x2**2 + y1**2 - 2*y1*y2 + y2**2)*(x1**2 - 2*x1*x3 + x3**2 + y1**2 - 2*y1*y3 + y3**2)
-                   * (x2**2 - 2*x2*x3 + x3**2 + y2**2 - 2*y2*y3 + y3**2))/(2*(x1*y2 - x1*y3 - x2*y1 + x2*y3 + x3*y1 - x3*y2)+1e-6)
-
-    theta1 = math.atan2((y1-y0), (x1-x0))
-    theta2 = math.atan2((y2-y0), (x2-x0))
-
-    return x0, y0, r, theta1, theta2, x3, y3
 
 
 def draw_pad(pad: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
@@ -173,11 +154,10 @@ def draw_wire(wire: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
         ax.add_line(l)
     else:
         # draw arc
-        u = curve/360.0
-        x0, y0, r, t1, t2, x3, y3 = get_arc(
-            x[0], y[0], x[1], y[1], math.radians(curve), u=u)
+        x0, y0, r, t1, t2, x3, y3 = get_arc_param(
+            x[0], y[0], x[1], y[1], curve)
 
-        arc = patches.Arc((x0, y0), r*2, r*2,
+        arc = ArcDataUnit((x0, y0), r*2, r*2,
                           theta1=math.degrees(t1),
                           theta2=math.degrees(t2),
                           linewidth=w,
