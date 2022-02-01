@@ -58,6 +58,25 @@ def search_layer(layers: ET.ElementTree, no: int):
     return None
 
 
+def rotate(x0, y0, dx, dy, rot='R0'):
+    if rot == 'R0':
+        x = [x0, x0+dx]
+        y = [y0, y0]
+        halign = 'left'
+        text_x = x0+2*dx
+    elif rot == 'R90':
+        x = [x0, x0]
+        y = [y0, y0+dx]
+    elif rot == 'R180':
+        x = [x0, x0-dx]
+        y = [y0, y0]
+        halign = 'right'
+        text_x = x0-2*dx
+    elif rot == 'R270':
+        x = [x0, x0]
+        y = [y0, y0-dx]
+
+
 def draw_pad(pad: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
     attr = pad.attrib
     x = float(attr['x'])
@@ -67,6 +86,10 @@ def draw_pad(pad: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
     diameter = 2*drill
     if 'diameter' in attr:
         diameter = float(attr['diameter'])
+
+    rot = 'R0'
+    if 'rot' in attr:
+        rot = attr['rot']
 
     # print(f'pad')
     # print(f'drill : {drill}, diameter : {diameter}')
@@ -98,12 +121,20 @@ def draw_smd(smd: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
     dx = float(attr['dx'])
     dy = float(attr['dy'])
 
-    # lower left corner location
-    x = x0-0.5*dx
-    y = y0-0.5*dy
+    rot = 'R0'
+    if 'rot' in attr:
+        rot = attr['rot']
 
-    w = dx
-    h = dy
+    if rot is 'R0' or rot is 'R180':
+        # lower left corner location
+        w = dx
+        h = dy
+    else:
+        w = dy
+        h = dx
+
+    x = x0-0.5*w
+    y = y0-0.5*h
 
     layer_no = int(attr['layer'])
     layer = search_layer(layers, layer_no)
