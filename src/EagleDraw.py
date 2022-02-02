@@ -1,7 +1,7 @@
 import xml.etree.ElementTree as ET
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
-from DiagramDataUnit import CircleDataUnit, TextDataUnit, Text, LineDataUnits, ArcDataUnit, get_arc_param
+from DiagramDataUnit import CircleDataUnit, TextDataUnit, Text, LineDataUnits, ArcDataUnit, RectDataUnit, get_arc_param
 from enum import Enum
 import os
 import math
@@ -107,13 +107,13 @@ def draw_smd(smd: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
         rot = attr['rot']
 
     if rot == 'R0' or rot == 'R180':
-        # lower left corner location
         w = dx
         h = dy
     else:
         w = dy
         h = dx
 
+    # lower left corner location
     x = x0-0.5*w
     y = y0-0.5*h
 
@@ -125,8 +125,13 @@ def draw_smd(smd: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
         logger.warning(f'color id {color_id} is undefined')
         color_id = 0
 
-    rect = patches.FancyBboxPatch(
-        xy=(x, y), width=w, height=h, fc=eagle_colors[color_id], ec=None, lw=None, zorder=-layer_no)
+    # rect = patches.FancyBboxPatch(
+    #     xy=(x, y), width=w, height=h, fc=eagle_colors[color_id], ec=None, lw=None, zorder=-layer_no,
+    #     mutation_scale=0)
+
+    rect = RectDataUnit(
+        xy=(x, y), width=w, height=h, fc=eagle_colors[color_id], ec=None, lw=None, zorder=-layer_no
+    )
     ax.add_patch(rect)
 
 
@@ -240,8 +245,10 @@ def draw_pin(pin: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
     dx = 2.54
     if length == 'short':
         dx = 2.54
+    if length == 'middle':
+        dx = 2.54*2
     elif length == 'long':
-        dx = 2.54
+        dx = 2.54*3
 
     rot = 'R0'
     if 'rot' in attr:

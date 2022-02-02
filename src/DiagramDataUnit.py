@@ -1,11 +1,8 @@
-import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 import matplotlib.patches as patches
 from matplotlib.text import Text
 
 import math
-
-from numpy import mat
 
 
 class LineDataUnits(Line2D):
@@ -29,6 +26,26 @@ class LineDataUnits(Line2D):
 
 
 class CircleDataUnit(patches.Circle):
+    def __init__(self, *args, **kwargs):
+        _lw_data = kwargs.pop("linewidth", 1)
+        super().__init__(*args, **kwargs)
+        self._lw_data = _lw_data
+
+    def _get_lw(self):
+        if self.axes is not None:
+            ppd = 72./self.axes.figure.dpi
+            trans = self.axes.transData.transform
+            return ((trans((1, self._lw_data))-trans((0, 0)))*ppd)[1]
+        else:
+            return 1
+
+    def _set_lw(self, lw):
+        self._lw_data = lw
+
+    _linewidth = property(_get_lw, _set_lw)
+
+
+class RectDataUnit(patches.Rectangle):
     def __init__(self, *args, **kwargs):
         _lw_data = kwargs.pop("linewidth", 1)
         super().__init__(*args, **kwargs)
@@ -93,6 +110,17 @@ def get_arc_param(x1, y1, x2, y2, curve: float = 0.5*math.pi):
 
     theta1 = math.atan2((y1-y0), (x1-x0))
     theta2 = math.atan2((y2-y0), (x2-x0))
+
+    # if theta2 < theta1:
+    #     t = theta1
+    #     theta1 = theta2
+    #     theta2 = t
+
+    # t = theta2 - theta1
+    # if (math.fabs(t)-math.fabs(curve)) > 1.0e-2:
+    #     theta1 -= 0.5*math.pi
+    #     theta2 -= 0.5*math.pi
+    # print(f'{theta1}, {theta2}')
 
     return x0, y0, r, theta1, theta2, x3, y3
 
