@@ -5,6 +5,8 @@ from matplotlib.text import Text
 
 import math
 
+from numpy import mat
+
 
 class LineDataUnits(Line2D):
     def __init__(self, *args, **kwargs):
@@ -66,9 +68,18 @@ class TextDataUnit(Text):
     _linewidth = property(_get_fontsize, _set_fontsize)
 
 
-def get_arc_param(x1, y1, x2, y2, phi, curve: float = 180.0):
-    u = -curve/360.0
+def get_arc_param(x1, y1, x2, y2, curve: float = 0.5*math.pi):
+
+    l = math.sqrt((x2-x1)**2 + (y2-y1)**2)
+    phi = math.pi*0.5 - curve*0.5
+
+    u = l*(1-math.sin(phi))/(2*math.cos(phi)+1e-6)
+    # if math.fabs(curve) > (math.pi - 0.001):
+    #     u *= -1
+
     n = [-(y2-y1), (x2-x1)]
+    nn = math.sqrt(n[0]**2 + n[1]**2)
+    n = [n[0]/nn, n[1]/nn]  # normalize
     m = [0.5*(x1+x2), 0.5*(y1+y2)]
     x3 = m[0] - u*n[0]
     y3 = m[1] - u*n[1]

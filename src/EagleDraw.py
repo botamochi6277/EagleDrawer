@@ -137,7 +137,7 @@ def draw_wire(wire: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
     w = float(attr['width'])
     curve = None
     if 'curve' in attr:
-        curve = float(attr['curve'])
+        curve = math.radians(float(attr['curve']))
 
     layer_no = int(attr['layer'])
     layer = search_layer(layers, layer_no)
