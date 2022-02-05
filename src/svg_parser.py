@@ -14,8 +14,13 @@ def parse_tf(s):
     # [b,d,ty],
     # [0,0,1]
     # ]
-
-    return t
+    # print(t)
+    a, b, c, d, tx, ty = t[0]
+    mat = np.matrix([[float(a), float(c), float(tx)],
+                     [float(b), float(d), float(ty)],
+                     [0, 0, 1]
+                     ])
+    return mat
 
 
 def seek_tree(tree: ET.ElementTree, tf=[]):
@@ -28,7 +33,7 @@ def seek_tree(tree: ET.ElementTree, tf=[]):
 
         if 'transform' in attr:
             if len(tf_c) == 0:
-                tf_c = parse_tf(attr['transform'])
+                tf_c = [parse_tf(attr['transform'])]
             else:
                 tf_c.append(parse_tf(attr['transform']))
 
