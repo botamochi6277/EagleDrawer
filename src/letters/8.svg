@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;">
+    <g transform="matrix(1,0,0,1,-160,-60)">
+        <g id="_8" serif:id="8" transform="matrix(1,0,0,1,-410,60)">
+            <rect x="570" y="0" width="20" height="20" style="fill:none;"/>
+            <g id="_8_1" serif:id="8_1" transform="matrix(0.0889855,0,0,-0.0889855,26.2878,203.01)">
+                <path d="M6192,2145L6193,2135L6197,2127L6204,2120L6213,2115L6222,2114L6232,2115L6240,2120L6247,2127L6251,2135L6253,2145L6251,2154L6247,2163L6240,2169L6232,2174L6222,2175L6213,2174L6204,2169L6197,2163L6193,2154L6192,2145" style="fill:none;fill-rule:nonzero;stroke:rgb(11,171,115);stroke-width:6.74px;"/>
+            </g>
+            <g id="_8_2" serif:id="8_2" transform="matrix(0.0889855,0,0,-0.0889855,26.2878,193.755)">
+                <path d="M6198,2096L6199,2087L6203,2080L6210,2075L6218,2072L6226,2072L6234,2075L6241,2080L6245,2087L6247,2096L6245,2104L6241,2112L6234,2117L6226,2120L6218,2120L6210,2117L6203,2112L6199,2104L6198,2096" style="fill:none;fill-rule:nonzero;stroke:rgb(11,171,115);stroke-width:6.74px;"/>
+            </g>
+        </g>
+    </g>
+</svg>

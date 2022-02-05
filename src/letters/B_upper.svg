@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;">
+    <g transform="matrix(1,0,0,1,-20,0)">
+        <g id="B" transform="matrix(1,0,0,1,-50,0)">
+            <rect x="70" y="0" width="20" height="20" style="fill:none;"/>
+            <g id="B1" transform="matrix(0.0889855,0,0,-0.0889855,-413.202,184.323)">
+                <path d="M5512,1965L5542,1965L5551,1967L5558,1971L5563,1977L5566,1985L5566,1994L5563,2002L5558,2009L5551,2013L5542,2014L5512,2014" style="fill:none;fill-rule:nonzero;stroke:rgb(11,171,115);stroke-width:6.74px;"/>
+            </g>
+            <g id="B2" transform="matrix(0.0889855,0,0,-0.0889855,-413.202,189.751)">
+                <path d="M5512,1965L5542,1965L5552,1966L5560,1971L5567,1978L5571,1986L5573,1996L5571,2005L5567,2014L5560,2020L5552,2025L5542,2026" style="fill:none;fill-rule:nonzero;stroke:rgb(11,171,115);stroke-width:6.74px;"/>
+            </g>
+            <g id="B3" transform="matrix(0,-0.0889855,0.0889855,0,-98.1045,500.488)">
+                <path d="M5457,1971L5567,1971" style="fill:none;fill-rule:nonzero;stroke:rgb(11,171,115);stroke-width:6.74px;"/>
+            </g>
+        </g>
+    </g>
+</svg>
