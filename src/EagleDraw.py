@@ -1,11 +1,19 @@
+from enum import Enum
+import os
+import sys
+import math
+import re
+
 import xml.etree.ElementTree as ET
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
+
+from svg_parser import seek_tree
 from DiagramDataUnit import CircleDataUnit, TextDataUnit, Text, LineDataUnits, ArcDataUnit, RectDataUnit, get_arc_param
-from enum import Enum
-import os
-import math
+
+
 from colorful_logger import get_colorful_logger
+
 logger = get_colorful_logger(__name__)
 
 
@@ -56,6 +64,27 @@ def search_layer(layers: ET.ElementTree, no: int):
             return l
 
     return None
+
+
+def draw_vector_letter(filename: str, offset=[0, 0], ax=None,
+                       w: float = 0.1, size: float = 1.0, color_id: int = 0, layer_no: int = 0):
+    if ax is None:
+        ax = plt.gca()
+    tree = ET.parse(filename)
+    root = tree.getroot()
+
+    pathes = []
+    pathes = seek_tree(root, [], pathes)
+
+    for p in pathes:
+        s = size/20.0
+        # centering, flap-y, scaling
+        x = [s*(xx[0]-10.0)+offset[0] for xx in p]
+        y = [s*(10.0-yy[1])+offset[1] for yy in p]
+        l = LineDataUnits(x, y, linewidth=w,
+                          color=eagle_colors[color_id], zorder=-layer_no)
+
+        ax.add_line(l)
 
 
 def draw_pad(pad: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
@@ -202,7 +231,37 @@ def draw_circle(circle: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
     ax.add_patch(c)
 
 
+def draw_letter(s, x, y, ax: plt.Axes, size: float = 0.0):
+    filename = ''
+    a = re.findall(r'[a-z]', s)
+    if len(a) > 0:
+        # Lower Alphabet
+        f = os.path.join(os.path.dirname(__file__),
+                         f'letters/{a[0]}_lower.svg')
+        draw_vector_letter(f, (x, y), ax, size=size)
+        return
+
+    A = re.findall(r'[A-Z]', s)
+    if len(A) > 0:
+        f = os.path.join(os.path.dirname(__file__),
+                         f'letters/{A[0]}_upper.svg')
+        draw_vector_letter(f, (x, y), ax, size=size)
+        return
+
+    n = re.findall(r'[0-9]', s)
+    if len(n) > 0:
+        f = os.path.join(os.path.dirname(__file__), f'letters/{n[0]}.svg')
+        draw_vector_letter(f, (x, y), ax, size=size)
+        return
+
+    f = os.path.join(os.path.dirname(__file__), f'letters/tofu.svg')
+    draw_vector_letter(f, (x, y), ax, size=size)
+
+
 def draw_text(text: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
+
+    # <text x="-12.7" y="-10.16" size="1.778" layer="95">&gt;VALUE</text>
+
     attr = text.attrib
     x = float(attr['x'])
     y = float(attr['y'])
@@ -215,15 +274,20 @@ def draw_text(text: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
         align = attr['align']
     txt = text.text
 
-    # inch to point
     layer_no = int(attr['layer'])
     layer = search_layer(layers, layer_no)
     color_id = int(layer.attrib['color'])
     if not color_id in eagle_colors:
         logger.warning(f'color id {color_id} is undefined')
         color_id = 0
-    t = ax.text(x, y, txt, fontfamily='sans-serif',
-                fontsize=size, zorder=-layer_no)
+    # t = ax.text(x, y, txt, fontfamily='sans-serif',
+    #             fontsize=size, zorder=-layer_no)
+
+    for s in txt:
+        draw_letter(s, x, y, ax, size)
+        x += 1
+        # y += 10
+
     # ppd = 72.0/ax.figure.dpi
     # tf = ax.transData.transform
     # fontsize = ((tf((1, size))-tf((0, 0)))*ppd)[1]

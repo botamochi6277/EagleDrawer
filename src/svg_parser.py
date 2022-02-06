@@ -25,7 +25,7 @@ def parse_tf(s):
 
 def transform(pos, transforms=[]):
 
-    print(f'transforms:\n{transforms}')
+    # print(f'transforms:\n{transforms}')
     p = np.matrix([pos[0], pos[1], 1]).T
     for tf in reversed(transforms):
         p = tf @ p
@@ -81,12 +81,13 @@ def seek_tree(tree: ET.ElementTree, tf=[], paths=[]):
             paths.append(transformed_pos)
 
         else:
-            print(f'{tag}')
+            pass
+            # print(f'{tag}')
             # print(f'tf: {tf_c}')
     return paths
 
 
-def show_text(filename):
+def show_text(filename: str):
     tree = ET.parse(filename)
     root = tree.getroot()
 
