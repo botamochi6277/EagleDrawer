@@ -42,8 +42,8 @@ def parse_node(s: str) -> Tuple:
         Tuple: (symbol, positions)
     """
     # https://developer.mozilla.org/ja/docs/Web/SVG/Tutorial/Paths
-    sy = re.findall(r'[a-zA-Z]', s)
-    l = re.split('[a-zA-Z]', s)  # sprit with alphabet
+    sy = re.findall(r'[a-zA-Z ]', s)
+    l = re.split('[a-zA-Z ]', s)  # sprit with alphabet
     pos = [p.split(',') for p in l[1:]]
 
     # convert str to float
