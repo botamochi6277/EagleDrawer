@@ -123,7 +123,18 @@ def search_layer(layers: ET.ElementTree, no: int):
 
 
 def draw_vector_letter(filename: str, offset=[0, 0], ax: plt.Axes = None,
-                       w: float = 0.1, size: float = 1.0, color_id: int = 0, layer_no: int = 0):
+                       w: float = 0.1, size: float = 1.0, color_id: int = 0, layer_no: int = 0) -> None:
+    """Draw A Letter in Vector style from svg file
+
+    Args:
+        filename (str): [description]
+        offset (list, optional): [description]. Defaults to [0, 0].
+        ax (plt.Axes, optional): [description]. Defaults to None.
+        w (float, optional): linewidth. Defaults to 0.1.
+        size (float, optional): [description]. Defaults to 1.0.
+        color_id (int, optional): [description]. Defaults to 0.
+        layer_no (int, optional): [description]. Defaults to 0.
+    """
     if ax is None:
         ax = plt.gca()
     tree = ET.parse(filename)
@@ -133,7 +144,7 @@ def draw_vector_letter(filename: str, offset=[0, 0], ax: plt.Axes = None,
     pathes = seek_tree(root, [], pathes)
     if len(pathes) == 0:
         return 0
-    x_all = []
+    # x_all = []
     for p in pathes:
         s = size/20.0
         # centering, flap-y, scaling
@@ -143,9 +154,9 @@ def draw_vector_letter(filename: str, offset=[0, 0], ax: plt.Axes = None,
                           color=eagle_colors[color_id], zorder=-layer_no)
 
         ax.add_line(l)
-        x_all.extend(x)
-    width = 2*max(x_all)
-    return width
+        # x_all.extend(x)
+    # width = 2*max(x_all)
+    # return width
 
 
 def draw_pad(pad: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
@@ -292,38 +303,37 @@ def draw_circle(circle: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
     ax.add_patch(c)
 
 
-def draw_letter(s, x, y, ax: plt.Axes, size: float = 0.0, width: float = 1.0) -> float:
-    filename = ''
+def draw_letter(s, x, y, **kwargs) -> float:
     a = re.findall(r'[a-z]', s)
     if len(a) > 0:
         # Lower Alphabet
         f = os.path.join(os.path.dirname(__file__),
                          f'letters/{a[0]}_lower.svg')
-        draw_vector_letter(f, (x, y), ax, size=size, w=width)
+        draw_vector_letter(f, (x, y), **kwargs)
         return
 
     A = re.findall(r'[A-Z]', s)
     if len(A) > 0:
         f = os.path.join(os.path.dirname(__file__),
                          f'letters/{A[0]}_upper.svg')
-        draw_vector_letter(f, (x, y), ax, size=size, w=width)
+        draw_vector_letter(f, (x, y), **kwargs)
         return
 
     n = re.findall(r'[0-9]', s)
     if len(n) > 0:
         f = os.path.join(os.path.dirname(__file__), f'letters/{n[0]}.svg')
-        draw_vector_letter(f, (x, y), ax, size=size, w=width)
+        draw_vector_letter(f, (x, y), **kwargs)
         return
 
     # symbols
     if s in symbol_map:
         f = os.path.join(os.path.dirname(__file__),
                          f'letters/{symbol_map[s]}.svg')
-        draw_vector_letter(f, (x, y), ax, size=size, w=width)
+        draw_vector_letter(f, (x, y), **kwargs)
         return
 
     f = os.path.join(os.path.dirname(__file__), f'letters/tofu.svg')
-    draw_vector_letter(f, (x, y), ax, size=size, w=width)
+    draw_vector_letter(f, (x, y), **kwargs)
     return
 
 
@@ -345,7 +355,7 @@ def draw_text(text: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
     ratio = 0.2
     if 'ratio' in attr:
         ratio = float(attr['ratio'])/100.0
-    linewidth = ratio*size/10.0
+    linewidth = ratio*size/5.0
     txt = text.text
 
     layer_no = int(attr['layer'])
@@ -361,7 +371,8 @@ def draw_text(text: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
     full_width = w*len(txt) + clearance*(len(txt)-1)
     offset = offset_from_align(align, full_width, size)
     for s in txt:
-        draw_letter(s, x+offset[0], y+offset[1], ax, size, width=linewidth)
+        draw_letter(s, x+offset[0], y+offset[1],
+                    ax=ax, size=size, w=linewidth, color_id=color_id, layer_no=layer_no)
         x += w + clearance
         # y += 10
 
@@ -424,10 +435,10 @@ def draw_pin(pin: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
     clearance = text_height*0.1
     full_width = text_width*len(name) + clearance*(len(name)-1)
     offset = offset_from_align(halign, full_width, text_height)
-    linewidth = 0.2*text_height/10.0
+    linewidth = 0.2*text_height/5.0
     for s in name:
         draw_letter(s, text_x+offset[0], text_y + offset[1],
-                    ax, text_height, width=linewidth)
+                    ax=ax, size=text_height, w=linewidth, color_id=color_id, layer_no=layer_no)
         text_x += text_width + clearance
     # ax.text(text_x, text_y, name, verticalalignment='center',
     #         horizontalalignment=halign, color=eagle_colors[color_id], zorder=-layer_no)
