@@ -11,7 +11,7 @@ import matplotlib.patches as patches
 from svg_parser import seek_tree
 from DiagramDataUnit import CircleDataUnit, TextDataUnit, Text, LineDataUnits, ArcDataUnit, RectDataUnit, get_arc_param
 
-
+import numpy as np
 from colorful_logger import get_colorful_logger
 
 logger = get_colorful_logger(__name__)
@@ -66,7 +66,7 @@ def search_layer(layers: ET.ElementTree, no: int):
     return None
 
 
-def draw_vector_letter(filename: str, offset=[0, 0], ax=None,
+def draw_vector_letter(filename: str, offset=[0, 0], ax: plt.Axes = None,
                        w: float = 0.1, size: float = 1.0, color_id: int = 0, layer_no: int = 0):
     if ax is None:
         ax = plt.gca()
@@ -75,16 +75,21 @@ def draw_vector_letter(filename: str, offset=[0, 0], ax=None,
 
     pathes = []
     pathes = seek_tree(root, [], pathes)
-
+    if len(pathes) == 0:
+        return 0
+    x_all = []
     for p in pathes:
         s = size/20.0
         # centering, flap-y, scaling
-        x = [s*(xx[0]-10.0)+offset[0] for xx in p]
-        y = [s*(10.0-yy[1])+offset[1] for yy in p]
-        l = LineDataUnits(x, y, linewidth=w,
+        x = np.array([s*(xx[0]-10.0) for xx in p])
+        y = np.array([s*(10.0-yy[1]) for yy in p])
+        l = LineDataUnits(x+offset[0], y+offset[1], linewidth=w,
                           color=eagle_colors[color_id], zorder=-layer_no)
 
         ax.add_line(l)
+        x_all.extend(x)
+    width = 2*max(x_all)
+    return width
 
 
 def draw_pad(pad: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
@@ -231,31 +236,32 @@ def draw_circle(circle: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
     ax.add_patch(c)
 
 
-def draw_letter(s, x, y, ax: plt.Axes, size: float = 0.0):
+def draw_letter(s, x, y, ax: plt.Axes, size: float = 0.0) -> float:
     filename = ''
     a = re.findall(r'[a-z]', s)
     if len(a) > 0:
         # Lower Alphabet
         f = os.path.join(os.path.dirname(__file__),
                          f'letters/{a[0]}_lower.svg')
-        draw_vector_letter(f, (x, y), ax, size=size)
-        return
+        w = draw_vector_letter(f, (x, y), ax, size=size)
+        return w
 
     A = re.findall(r'[A-Z]', s)
     if len(A) > 0:
         f = os.path.join(os.path.dirname(__file__),
                          f'letters/{A[0]}_upper.svg')
-        draw_vector_letter(f, (x, y), ax, size=size)
-        return
+        w = draw_vector_letter(f, (x, y), ax, size=size)
+        return w
 
     n = re.findall(r'[0-9]', s)
     if len(n) > 0:
         f = os.path.join(os.path.dirname(__file__), f'letters/{n[0]}.svg')
-        draw_vector_letter(f, (x, y), ax, size=size)
-        return
+        w = draw_vector_letter(f, (x, y), ax, size=size)
+        return w
 
     f = os.path.join(os.path.dirname(__file__), f'letters/tofu.svg')
-    draw_vector_letter(f, (x, y), ax, size=size)
+    w = draw_vector_letter(f, (x, y), ax, size=size)
+    return w
 
 
 def draw_text(text: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
@@ -282,10 +288,10 @@ def draw_text(text: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
         color_id = 0
     # t = ax.text(x, y, txt, fontfamily='sans-serif',
     #             fontsize=size, zorder=-layer_no)
-
+    clearance = size*0.2
     for s in txt:
-        draw_letter(s, x, y, ax, size)
-        x += 1
+        w = draw_letter(s, x, y, ax, size)
+        x += w + clearance
         # y += 10
 
     # ppd = 72.0/ax.figure.dpi
