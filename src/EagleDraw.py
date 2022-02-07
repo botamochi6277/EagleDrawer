@@ -332,25 +332,35 @@ def draw_text(text: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
     if not color_id in eagle_colors:
         logger.warning(f'color id {color_id} is undefined')
         color_id = 0
-    # t = ax.text(x, y, txt, fontfamily='sans-serif',
-    #             fontsize=size, zorder=-layer_no)
+
     clearance = size*0.1
     w = 0.5*size
+    x += w  # default origin is left
+    full_width = w*len(txt) + clearance*(len(txt)-1)
+    offset = [0, 0]
+    if align == 'top-left':
+        offset = [0, -size*0.5]
+    elif align == 'top-center':
+        offset = [-0.5*full_width, -size*0.5]
+    elif align == 'top-right':
+        offset = [-full_width, -size*0.5]
+    elif align == 'left':
+        offset = [-0, 0]
+    elif align == 'center':
+        offset = [-0.5*full_width, 0]
+    elif align == 'right':
+        offset = [-full_width, 0]
+    elif align == 'bottom-left':
+        offset = [-0, size*0.5]
+    elif align == 'bottom-center':
+        offset = [-0.5*full_width, size*0.5]
+    elif align == 'bottom-right':
+        offset = [-full_width, size*0.5]
+    logger.debug(f'{txt}-offset: {offset}')
     for s in txt:
-        draw_letter(s, x, y, ax, size, width=linewidth)
+        draw_letter(s, x+offset[0], y+offset[1], ax, size, width=linewidth)
         x += w + clearance
         # y += 10
-
-    # ppd = 72.0/ax.figure.dpi
-    # tf = ax.transData.transform
-    # fontsize = ((tf((1, size))-tf((0, 0)))*ppd)[1]
-    # t.set_fontsize(fontsize)
-
-    # print(f'text type: {type(t)}')
-    # t = TextDataUnit(x, y, txt, fontfamily='monospace',
-    #                  fontsize=size, zorder=-layer_no, transform=ax.transAxes)
-
-    # ax.add_artist(t)
 
 
 def draw_pin(pin: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
