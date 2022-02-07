@@ -236,31 +236,31 @@ def draw_circle(circle: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
     ax.add_patch(c)
 
 
-def draw_letter(s, x, y, ax: plt.Axes, size: float = 0.0) -> float:
+def draw_letter(s, x, y, ax: plt.Axes, size: float = 0.0, width: float = 1.0) -> float:
     filename = ''
     a = re.findall(r'[a-z]', s)
     if len(a) > 0:
         # Lower Alphabet
         f = os.path.join(os.path.dirname(__file__),
                          f'letters/{a[0]}_lower.svg')
-        w = draw_vector_letter(f, (x, y), ax, size=size)
+        w = draw_vector_letter(f, (x, y), ax, size=size, w=width)
         return w
 
     A = re.findall(r'[A-Z]', s)
     if len(A) > 0:
         f = os.path.join(os.path.dirname(__file__),
                          f'letters/{A[0]}_upper.svg')
-        w = draw_vector_letter(f, (x, y), ax, size=size)
+        w = draw_vector_letter(f, (x, y), ax, size=size, w=width)
         return w
 
     n = re.findall(r'[0-9]', s)
     if len(n) > 0:
         f = os.path.join(os.path.dirname(__file__), f'letters/{n[0]}.svg')
-        w = draw_vector_letter(f, (x, y), ax, size=size)
+        w = draw_vector_letter(f, (x, y), ax, size=size, w=width)
         return w
 
     f = os.path.join(os.path.dirname(__file__), f'letters/tofu.svg')
-    w = draw_vector_letter(f, (x, y), ax, size=size)
+    w = draw_vector_letter(f, (x, y), ax, size=size, w=width)
     return w
 
 
@@ -278,6 +278,11 @@ def draw_text(text: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
     align = 'left'
     if 'align' in attr:
         align = attr['align']
+
+    ratio = 0.2
+    if 'ratio' in attr:
+        ratio = float(attr['ratio'])/100.0
+    width = ratio*size/20.0
     txt = text.text
 
     layer_no = int(attr['layer'])
@@ -290,7 +295,7 @@ def draw_text(text: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
     #             fontsize=size, zorder=-layer_no)
     clearance = size*0.2
     for s in txt:
-        w = draw_letter(s, x, y, ax, size)
+        w = draw_letter(s, x, y, ax, size, width=width)
         x += w + clearance
         # y += 10
 
