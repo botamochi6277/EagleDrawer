@@ -46,6 +46,40 @@ eagle_colors = {
     95: '#ff0000',
     96: '#ff0000', }
 
+symbol_map = {
+    '&': 'and',
+    '\'': 'apostrophe',
+    '*': 'asterisk',
+    '@': 'at',
+    '(': 'bracket-l',
+    ')': 'bracket-r',
+    '^': 'circumflex',
+    ':': 'colon',
+    ',': 'comma',
+    '{': 'curly-bracket-l',
+    '}': 'curly-bracket-r',
+    '$': 'dollar',
+    '=': 'equal',
+    '!': 'exclamation',
+    '>': 'ge',
+    '`': 'grave',
+    '-': 'hyphen',
+    '<': 'le',
+    '#': 'no',
+    '%': 'per',
+    '.': 'period',
+    '+': 'plus',
+    '?': 'question',
+    '\"': 'quotation',
+    ';': 'semicolon',
+    '/': 'slash',
+    '[': 'sq-bracket-l',
+    ']': 'sq-bracket-r',
+    '~': 'tilde',
+    '_': 'underscore',
+    '|': 'vertical'
+}
+
 
 def inch_to_point(inch):
     dpi = 72  # dot per inch
@@ -256,6 +290,13 @@ def draw_letter(s, x, y, ax: plt.Axes, size: float = 0.0, width: float = 1.0) ->
     n = re.findall(r'[0-9]', s)
     if len(n) > 0:
         f = os.path.join(os.path.dirname(__file__), f'letters/{n[0]}.svg')
+        w = draw_vector_letter(f, (x, y), ax, size=size, w=width)
+        return w
+
+    # symbols
+    if s in symbol_map:
+        f = os.path.join(os.path.dirname(__file__),
+                         f'letters/{symbol_map[s]}.svg')
         w = draw_vector_letter(f, (x, y), ax, size=size, w=width)
         return w
 
