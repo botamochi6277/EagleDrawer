@@ -277,31 +277,31 @@ def draw_letter(s, x, y, ax: plt.Axes, size: float = 0.0, width: float = 1.0) ->
         # Lower Alphabet
         f = os.path.join(os.path.dirname(__file__),
                          f'letters/{a[0]}_lower.svg')
-        w = draw_vector_letter(f, (x, y), ax, size=size, w=width)
-        return w
+        draw_vector_letter(f, (x, y), ax, size=size, w=width)
+        return
 
     A = re.findall(r'[A-Z]', s)
     if len(A) > 0:
         f = os.path.join(os.path.dirname(__file__),
                          f'letters/{A[0]}_upper.svg')
-        w = draw_vector_letter(f, (x, y), ax, size=size, w=width)
-        return w
+        draw_vector_letter(f, (x, y), ax, size=size, w=width)
+        return
 
     n = re.findall(r'[0-9]', s)
     if len(n) > 0:
         f = os.path.join(os.path.dirname(__file__), f'letters/{n[0]}.svg')
-        w = draw_vector_letter(f, (x, y), ax, size=size, w=width)
-        return w
+        draw_vector_letter(f, (x, y), ax, size=size, w=width)
+        return
 
     # symbols
     if s in symbol_map:
         f = os.path.join(os.path.dirname(__file__),
                          f'letters/{symbol_map[s]}.svg')
-        w = draw_vector_letter(f, (x, y), ax, size=size, w=width)
-        return w
+        draw_vector_letter(f, (x, y), ax, size=size, w=width)
+        return
 
     f = os.path.join(os.path.dirname(__file__), f'letters/tofu.svg')
-    w = draw_vector_letter(f, (x, y), ax, size=size, w=width)
+    draw_vector_letter(f, (x, y), ax, size=size, w=width)
     return w
 
 
@@ -323,7 +323,7 @@ def draw_text(text: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
     ratio = 0.2
     if 'ratio' in attr:
         ratio = float(attr['ratio'])/100.0
-    width = ratio*size/20.0
+    linewidth = ratio*size/10.0
     txt = text.text
 
     layer_no = int(attr['layer'])
@@ -334,9 +334,10 @@ def draw_text(text: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
         color_id = 0
     # t = ax.text(x, y, txt, fontfamily='sans-serif',
     #             fontsize=size, zorder=-layer_no)
-    clearance = size*0.2
+    clearance = size*0.1
+    w = 0.5*size
     for s in txt:
-        w = draw_letter(s, x, y, ax, size, width=width)
+        draw_letter(s, x, y, ax, size, width=linewidth)
         x += w + clearance
         # y += 10
 
