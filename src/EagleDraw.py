@@ -81,6 +81,28 @@ symbol_map = {
 }
 
 
+def offset_from_align(align, width: float, height: float):
+    if align == 'top-left':
+        offset = [0, -height*0.5]
+    elif align == 'top-center':
+        offset = [-0.5*width, -height*0.5]
+    elif align == 'top-right':
+        offset = [-width, -height*0.5]
+    elif align == 'left':
+        offset = [0, 0]
+    elif align == 'center':
+        offset = [-0.5*width, 0]
+    elif align == 'right':
+        offset = [-width, 0]
+    elif align == 'bottom-left':
+        offset = [-0, height*0.5]
+    elif align == 'bottom-center':
+        offset = [-0.5*width, height*0.5]
+    elif align == 'bottom-right':
+        offset = [-width, height*0.5]
+    return offset
+
+
 def inch_to_point(inch):
     dpi = 72  # dot per inch
     return inch * dpi
@@ -302,7 +324,7 @@ def draw_letter(s, x, y, ax: plt.Axes, size: float = 0.0, width: float = 1.0) ->
 
     f = os.path.join(os.path.dirname(__file__), f'letters/tofu.svg')
     draw_vector_letter(f, (x, y), ax, size=size, w=width)
-    return w
+    return
 
 
 def draw_text(text: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
@@ -337,26 +359,7 @@ def draw_text(text: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
     w = 0.5*size
     x += w  # default origin is left
     full_width = w*len(txt) + clearance*(len(txt)-1)
-    offset = [0, 0]
-    if align == 'top-left':
-        offset = [0, -size*0.5]
-    elif align == 'top-center':
-        offset = [-0.5*full_width, -size*0.5]
-    elif align == 'top-right':
-        offset = [-full_width, -size*0.5]
-    elif align == 'left':
-        offset = [-0, 0]
-    elif align == 'center':
-        offset = [-0.5*full_width, 0]
-    elif align == 'right':
-        offset = [-full_width, 0]
-    elif align == 'bottom-left':
-        offset = [-0, size*0.5]
-    elif align == 'bottom-center':
-        offset = [-0.5*full_width, size*0.5]
-    elif align == 'bottom-right':
-        offset = [-full_width, size*0.5]
-    logger.debug(f'{txt}-offset: {offset}')
+    offset = offset_from_align(align, full_width, size)
     for s in txt:
         draw_letter(s, x+offset[0], y+offset[1], ax, size, width=linewidth)
         x += w + clearance
@@ -414,8 +417,20 @@ def draw_pin(pin: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
 
     ax.add_line(l)
 
-    ax.text(text_x, text_y, name, verticalalignment='center',
-            horizontalalignment=halign, color=eagle_colors[color_id], zorder=-layer_no)
+    # Name
+    text_height = 2.0
+    text_width = 0.5*text_height
+    text_x += text_width  # default origin is left
+    clearance = text_height*0.1
+    full_width = text_width*len(name) + clearance*(len(name)-1)
+    offset = offset_from_align(halign, full_width, text_height)
+    linewidth = 0.2*text_height/10.0
+    for s in name:
+        draw_letter(s, text_x+offset[0], text_y + offset[1],
+                    ax, text_height, width=linewidth)
+        text_x += text_width + clearance
+    # ax.text(text_x, text_y, name, verticalalignment='center',
+    #         horizontalalignment=halign, color=eagle_colors[color_id], zorder=-layer_no)
 
 
 def draw_package(package: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
