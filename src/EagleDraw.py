@@ -1,19 +1,19 @@
-from enum import Enum
-import os
-import sys
 import math
+import os
 import re
-from typing import Tuple, List
-
+import sys
 import xml.etree.ElementTree as ET
-import matplotlib.pyplot as plt
+from enum import Enum
+from typing import List, Tuple
+
 import matplotlib.patches as patches
-
-from svg_parser import seek_tree
-from DiagramDataUnit import CircleDataUnit, TextDataUnit, Text, LineDataUnits, ArcDataUnit, RectDataUnit, get_arc_param
-
+import matplotlib.pyplot as plt
 import numpy as np
+
 from colorful_logger import get_colorful_logger
+from DiagramDataUnit import (ArcDataUnit, CircleDataUnit, LineDataUnits,
+                             RectDataUnit, Text, TextDataUnit, get_arc_param)
+from svg_parser import seek_tree
 
 logger = get_colorful_logger(__name__)
 
@@ -176,7 +176,7 @@ def draw_vector_letter(filename: str, offset=[0, 0], ax: plt.Axes = None,
 
         # a, b = rotate(offset[0], offset[1], angle)
         l = LineDataUnits(u+offset[0], v+offset[1], linewidth=w,
-                          color=eagle_colors[color_id], zorder=-layer_no)
+                          color=eagle_colors[color_id], zorder=-layer_no, solid_capstyle='round')
 
         ax.add_line(l)
         # x_all.extend(x)
@@ -280,7 +280,7 @@ def draw_wire(wire: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
     if curve is None:
         # straight line
         l = LineDataUnits(x, y, linewidth=w,
-                          color=eagle_colors[color_id], zorder=-layer_no)
+                          color=eagle_colors[color_id], zorder=-layer_no, solid_capstyle='round')
 
         ax.add_line(l)
     else:
