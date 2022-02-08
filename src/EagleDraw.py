@@ -81,25 +81,26 @@ symbol_map = {
 }
 
 
-def offset_from_align(align, width: float, height: float):
+def offset_from_align(align, width: float, height: float, fullwidth: float):
     if align == 'top-left':
         offset = [0, -height*0.5]
     elif align == 'top-center':
-        offset = [-0.5*width, -height*0.5]
+        offset = [-0.5*fullwidth, -height*0.5]
     elif align == 'top-right':
-        offset = [-width, -height*0.5]
+        offset = [-fullwidth, -height*0.5]
     elif align == 'left':
         offset = [0, 0]
     elif align == 'center':
-        offset = [-0.5*width, 0]
+        offset = [-0.5*fullwidth, 0]
     elif align == 'right':
-        offset = [-width, 0]
+        offset = [-fullwidth, 0]
     elif align == 'bottom-left':
         offset = [-0, height*0.5]
     elif align == 'bottom-center':
-        offset = [-0.5*width, height*0.5]
+        offset = [-0.5*fullwidth, height*0.5]
     elif align == 'bottom-right':
-        offset = [-width, height*0.5]
+        offset = [-fullwidth, height*0.5]
+    offset[0] += 0.5*width
     return offset
 
 
@@ -146,7 +147,7 @@ def draw_vector_letter(filename: str, offset=[0, 0], ax: plt.Axes = None,
         return 0
     # x_all = []
     for p in pathes:
-        s = size/20.0
+        s = size/12.7
         # centering, flap-y, scaling
         x = np.array([s*(xx[0]-10.0) for xx in p])
         y = np.array([s*(10.0-yy[1]) for yy in p])
@@ -303,7 +304,14 @@ def draw_circle(circle: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
     ax.add_patch(c)
 
 
-def draw_letter(s, x, y, **kwargs) -> float:
+def draw_letter(s: str, x: float, y: float, **kwargs) -> None:
+    """Draw a letter
+
+    Args:
+        s (str): single letter to draw
+        x (float): letter center x-position
+        y (float): letter center y-position
+    """
     a = re.findall(r'[a-z]', s)
     if len(a) > 0:
         # Lower Alphabet
@@ -348,7 +356,7 @@ def draw_text(text: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
     font = 'monospace'
     if 'font' in attr:
         font = attr['font']
-    align = 'left'
+    align = 'bottom-left'
     if 'align' in attr:
         align = attr['align']
 
@@ -367,9 +375,14 @@ def draw_text(text: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
 
     clearance = size*0.1
     w = 0.5*size
-    x += w  # default origin is left
     full_width = w*len(txt) + clearance*(len(txt)-1)
-    offset = offset_from_align(align, full_width, size)
+    offset = offset_from_align(align, w, size, full_width)
+    # logger.debug(f'align: {align}, offset: {offset}')
+    # draw text origin
+    c = CircleDataUnit(xy=(x, y), radius=0.01, ec=eagle_colors[color_id],
+                       fill=False, linewidth=0.1, zorder=-layer_no)
+    ax.add_patch(c)
+
     for s in txt:
         draw_letter(s, x+offset[0], y+offset[1],
                     ax=ax, size=size, w=linewidth, color_id=color_id, layer_no=layer_no)
@@ -434,11 +447,11 @@ def draw_pin(pin: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
     text_x += text_width  # default origin is left
     clearance = text_height*0.1
     full_width = text_width*len(name) + clearance*(len(name)-1)
-    offset = offset_from_align(halign, full_width, text_height)
+    offset = offset_from_align(halign, w, text_height, full_width)
     linewidth = 0.2*text_height/5.0
     for s in name:
         draw_letter(s, text_x+offset[0], text_y + offset[1],
-                    ax=ax, size=text_height, w=linewidth, color_id=color_id, layer_no=layer_no)
+                    ax=ax, size=text_height, w=linewidth, color_id=0, layer_no=layer_no)
         text_x += text_width + clearance
     # ax.text(text_x, text_y, name, verticalalignment='center',
     #         horizontalalignment=halign, color=eagle_colors[color_id], zorder=-layer_no)
