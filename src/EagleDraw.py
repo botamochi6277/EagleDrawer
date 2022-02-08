@@ -3,6 +3,7 @@ import os
 import sys
 import math
 import re
+from typing import Tuple, List
 
 import xml.etree.ElementTree as ET
 import matplotlib.pyplot as plt
@@ -82,6 +83,7 @@ symbol_map = {
 
 
 def offset_from_align(align, width: float, height: float, fullwidth: float):
+    offset = [0, 0]
     if align == 'top-left':
         offset = [0, -height*0.5]
     elif align == 'top-center':
@@ -104,6 +106,16 @@ def offset_from_align(align, width: float, height: float, fullwidth: float):
     return offset
 
 
+def hflip_align(align: str):
+    l = align.split('-')
+    if len(l) == 0:
+        return align
+    if l[0] == 'top':
+        return f'bottom-{l[1]}'
+    if l[0] == 'bottom':
+        return f'top-{l[1]}'
+
+
 def inch_to_point(inch):
     dpi = 72  # dot per inch
     return inch * dpi
@@ -123,8 +135,15 @@ def search_layer(layers: ET.ElementTree, no: int):
     return None
 
 
+def rotate(x, y, angle: float) -> Tuple:
+    u = np.cos(angle)*x-np.sin(angle)*y
+    v = np.sin(angle)*x+np.cos(angle)*y
+    return u, v
+
+
 def draw_vector_letter(filename: str, offset=[0, 0], ax: plt.Axes = None,
-                       w: float = 0.1, size: float = 1.0, color_id: int = 0, layer_no: int = 0) -> None:
+                       w: float = 0.1, size: float = 1.0, angle: float = 0.0,
+                       color_id: int = 0, layer_no: int = 0) -> None:
     """Draw A Letter in Vector style from svg file
 
     Args:
@@ -133,6 +152,7 @@ def draw_vector_letter(filename: str, offset=[0, 0], ax: plt.Axes = None,
         ax (plt.Axes, optional): [description]. Defaults to None.
         w (float, optional): linewidth. Defaults to 0.1.
         size (float, optional): [description]. Defaults to 1.0.
+        angle (float, optional): [description]. Defaults to 0.0.
         color_id (int, optional): [description]. Defaults to 0.
         layer_no (int, optional): [description]. Defaults to 0.
     """
@@ -151,7 +171,11 @@ def draw_vector_letter(filename: str, offset=[0, 0], ax: plt.Axes = None,
         # centering, flap-y, scaling
         x = np.array([s*(xx[0]-10.0) for xx in p])
         y = np.array([s*(10.0-yy[1]) for yy in p])
-        l = LineDataUnits(x+offset[0], y+offset[1], linewidth=w,
+
+        u, v = rotate(x, y, angle)
+
+        # a, b = rotate(offset[0], offset[1], angle)
+        l = LineDataUnits(u+offset[0], v+offset[1], linewidth=w,
                           color=eagle_colors[color_id], zorder=-layer_no)
 
         ax.add_line(l)
@@ -366,6 +390,15 @@ def draw_text(text: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
     linewidth = ratio*size/5.0
     txt = text.text
 
+    rot = 'R0'
+    if 'rot' in attr:
+        rot = attr['rot']
+    angle = float(rot[1:])
+
+    if (91 < angle) or (270 < angle):
+        align = hflip_align(align)
+        angle -= 180
+
     layer_no = int(attr['layer'])
     layer = search_layer(layers, layer_no)
     color_id = int(layer.attrib['color'])
@@ -377,6 +410,10 @@ def draw_text(text: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
     w = 0.5*size
     full_width = w*len(txt) + clearance*(len(txt)-1)
     offset = offset_from_align(align, w, size, full_width)
+    offset = rotate(offset[0], offset[1], math.radians(angle))
+    dx = w+clearance
+    dy = 0
+    dx, dy = rotate(dx, dy, math.radians(angle))
     # logger.debug(f'align: {align}, offset: {offset}')
     # draw text origin
     c = CircleDataUnit(xy=(x, y), radius=0.01, ec=eagle_colors[color_id],
@@ -385,9 +422,9 @@ def draw_text(text: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
 
     for s in txt:
         draw_letter(s, x+offset[0], y+offset[1],
-                    ax=ax, size=size, w=linewidth, color_id=color_id, layer_no=layer_no)
-        x += w + clearance
-        # y += 10
+                    ax=ax, size=size, angle=math.radians(angle), w=linewidth, color_id=color_id, layer_no=layer_no)
+        x += dx
+        y += dy
 
 
 def draw_pin(pin: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
