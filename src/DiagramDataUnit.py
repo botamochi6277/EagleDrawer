@@ -108,13 +108,28 @@ def get_arc_param(x1, y1, x2, y2, curve: float = 0.5*math.pi):
     r = -math.sqrt((x1**2 - 2*x1*x2 + x2**2 + y1**2 - 2*y1*y2 + y2**2)*(x1**2 - 2*x1*x3 + x3**2 + y1**2 - 2*y1*y3 + y3**2)
                    * (x2**2 - 2*x2*x3 + x3**2 + y2**2 - 2*y2*y3 + y3**2))/(2*(x1*y2 - x1*y3 - x2*y1 + x2*y3 + x3*y1 - x3*y2)+1e-6)
 
+    # if curve < 0:
+    #     x = x1
+    #     y = y1
+    #     x1 = x2
+    #     y1 = y2
+    #     x2 = x
+    #     y2 = y
+
     theta1 = math.atan2((y1-y0), (x1-x0))
     theta2 = math.atan2((y2-y0), (x2-x0))
 
+    if curve < 0:
+        # if theta1 < 0:
+        theta1 += math.pi
+
+    # if theta2 < 0:
+        theta2 += math.pi
+
     # if theta2 < theta1:
-    #     t = theta1
-    #     theta1 = theta2
-    #     theta2 = t
+        t = theta1
+        theta1 = theta2
+        theta2 = t
 
     # t = theta2 - theta1
     # if (math.fabs(t)-math.fabs(curve)) > 1.0e-2:

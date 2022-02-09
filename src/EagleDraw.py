@@ -90,11 +90,11 @@ def offset_from_align(align, width: float, height: float, fullwidth: float):
         offset = [-0.5*fullwidth, -height*0.5]
     elif align == 'top-right':
         offset = [-fullwidth, -height*0.5]
-    elif align == 'left':
+    elif align == 'center-left':
         offset = [0, 0]
     elif align == 'center':
         offset = [-0.5*fullwidth, 0]
-    elif align == 'right':
+    elif align == 'center-right':
         offset = [-fullwidth, 0]
     elif align == 'bottom-left':
         offset = [-0, height*0.5]
@@ -114,6 +114,7 @@ def hflip_align(align: str):
         return f'bottom-{l[1]}'
     if l[0] == 'bottom':
         return f'top-{l[1]}'
+    return align
 
 
 def inch_to_point(inch):
@@ -297,16 +298,29 @@ def draw_wire(wire: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
 
         # debug
         # reference point
-        c = CircleDataUnit(xy=(x3, y3), radius=0.1, ec=eagle_colors[color_id],
-                           fill=False, linewidth=w, zorder=-layer_no)
-        ax.add_patch(c)
+        # c = CircleDataUnit(xy=(x3, y3), radius=0.1, ec=eagle_colors[4],
+        #                    fill=False, linewidth=w, zorder=-layer_no)
+        # ax.add_patch(c)
 
-        # mid point
-        m = [0.5*(x[0]+x[1]), 0.5*(y[0]+y[1])]
+        # # xy
+        # c = CircleDataUnit(xy=(x[0], y[0]), radius=0.1, ec=eagle_colors[6],
+        #                    fill=False, linewidth=w, zorder=-layer_no)
+        # ax.add_patch(c)
+        # c = CircleDataUnit(xy=(x[1], y[1]), radius=0.1, ec=eagle_colors[7],
+        #                    fill=False, linewidth=w, zorder=-layer_no)
+        # ax.add_patch(c)
 
-        c = CircleDataUnit(xy=m, radius=0.01, ec=eagle_colors[color_id],
-                           fill=False, linewidth=w, zorder=-layer_no)
-        ax.add_patch(c)
+        # # mid point
+        # m = [0.5*(x[0]+x[1]), 0.5*(y[0]+y[1])]
+
+        # c = CircleDataUnit(xy=m, radius=0.01, ec=eagle_colors[4],
+        #                    fill=False, linewidth=w, zorder=-layer_no)
+        # ax.add_patch(c)
+
+        # # arc center
+        # c = CircleDataUnit(xy=(x0, y0), radius=0.05, ec=eagle_colors[4],
+        #                    fill=False, linewidth=w, zorder=-layer_no)
+        # ax.add_patch(c)
 
 
 def draw_circle(circle: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
