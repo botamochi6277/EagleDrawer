@@ -408,7 +408,7 @@ def draw_text(text: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
     rot = 'R0'
     if 'rot' in attr:
         rot = attr['rot']
-    angle = float(re.findall('[0-9+?]', rot)[0])
+    angle = float(''.join(re.findall('[0-9+?]', rot)))
 
     if (91 < angle) or (270 < angle):
         align = hflip_align(align)
@@ -467,7 +467,7 @@ def draw_pin(pin: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
     if rot == 'R0':
         x = [x0, x0+dx]
         y = [y0, y0]
-        halign = 'left'
+        halign = 'center-left'
         text_x = x0+2*dx
     elif rot == 'R90':
         x = [x0, x0]
@@ -475,7 +475,7 @@ def draw_pin(pin: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
     elif rot == 'R180':
         x = [x0, x0-dx]
         y = [y0, y0]
-        halign = 'right'
+        halign = 'center-right'
         text_x = x0-2*dx
     elif rot == 'R270':
         x = [x0, x0]
