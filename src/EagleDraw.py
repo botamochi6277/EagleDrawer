@@ -408,7 +408,7 @@ def draw_text(text: ET.ElementTree, layers: ET.ElementTree, ax: plt.Axes):
     rot = 'R0'
     if 'rot' in attr:
         rot = attr['rot']
-    angle = float(rot[1:])
+    angle = float(re.findall('[0-9+?]', rot)[0])
 
     if (91 < angle) or (270 < angle):
         align = hflip_align(align)
