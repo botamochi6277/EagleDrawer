@@ -78,7 +78,8 @@ symbol_map = {
     ']': 'sq-bracket-r',
     '~': 'tilde',
     '_': 'underscore',
-    '|': 'vertical'
+    '|': 'vertical',
+    ' ': 'space'
 }
 
 
